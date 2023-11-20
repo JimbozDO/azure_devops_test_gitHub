@@ -12,4 +12,4 @@ jobs:
     steps:
       - script: |
             #!/bin/bash
-            echo "[INFO] Inside the build_job_template.yml - ${{ parameters.process_version }}"
+            echo "[INFO] Inside the test_job_template.yml - ${{ parameters.process_version }}"
