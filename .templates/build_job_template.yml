@@ -1,0 +1,15 @@
+parameters:
+  - name: jobName
+    type: string
+    default: "Create Package"
+  - name: process_version
+    type: string
+    default: ""
+
+jobs:
+  - job: Job_1
+    displayName: "Agent job: create deployed package"
+    steps:
+      - script: |
+            #!/bin/bash
+            echo "[INFO] Inside the build_job_template.yml - ${{ parameters.process_version }}"

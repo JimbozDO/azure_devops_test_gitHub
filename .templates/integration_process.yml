@@ -1,0 +1,89 @@
+parameters:
+  - name: test_postmanCollection_SIT
+    type: string
+    default: ""
+  - name: test_postmanEnvironment_SIT
+    type: string
+    default: ""
+  - name: test_additionalParams_SIT
+    type: string
+    default: ""
+  - name: test_testReportTitle_SIT
+    type: string
+    default: ""
+  - name: test_postmanCollection_UAT
+    type: string
+    default: ""
+  - name: test_postmanEnvironment_UAT
+    type: string
+    default: ""
+  - name: test_additionalParams_UAT
+    type: string
+    default: ""
+  - name: test_testReportTitle_UAT
+    type: string
+    default: ""
+  - name: process_version
+    type: string
+    default: ""
+
+stages:
+  - stage: Build
+    displayName: "Build Deployed Package"
+    condition: |
+      or(
+        and(
+          eq(variables['Build.Reason'], 'PullRequest'),
+          eq(variables['System.PullRequest.TargetBranch'], 'refs/heads/dev')
+        ),
+        and(
+          in(variables['Build.Reason'], 'IndividualCI', 'Manual'),
+          or(
+            contains(variables['Build.SourceBranch'], 'feature'),
+            contains(variables['Build.SourceBranch'], 'bug'),
+            eq(variables['Build.SourceBranchName'], 'dev')
+          )
+        )
+      )
+    jobs:
+      - template: build_job_template.yml
+        parameters:
+          jobName: "Create Package"
+          process_version: ${{ parameters.process_version }}
+
+  - stage: Dev
+    displayName: "Deploy to Dev Env" #Name displayed when viewing
+    dependsOn: ["Build"] #List of previous stages that must complete before this stage runs
+    condition: |
+      and(
+        succeeded(),
+        eq(variables['Build.Reason'], 'PullRequest'),
+        eq(variables['System.PullRequest.TargetBranch'], 'refs/heads/dev')
+      )
+    jobs:
+      - job: Job_1
+        displayName: "Start build"
+        steps:
+          - script: |
+              #!/bin/bash
+              echo "[INFO] New var process_version - ${{ parameters.process_version }}"
+              ./build.sh
+            displayName: "Print Message"
+
+  - stage: Test
+    displayName: "Autotests" # Name displayed when viewing in Azure DevOps
+    dependsOn: ["Dev"] # List of previous stages that must complete before this stage runs
+    condition: |
+      and(
+        succeeded(),
+        eq(variables['Build.Reason'], 'PullRequest'),
+        eq(variables['System.PullRequest.TargetBranch'], 'refs/heads/dev')
+      )
+    jobs:
+      - template: test_job_template.yml
+        parameters:
+          postmanCollection: ${{ parameters.test_postmanCollection_SIT }}
+          postmanEnvironment: ${{ parameters.test_postmanEnvironment_SIT }}
+          additionalParams: ${{ parameters.test_additionalParams_SIT }}
+          testReportTitle: ${{ parameters.test_testReportTitle_SIT }}
+

@@ -1,0 +1,38 @@
+name: "$(Build.DefinitionName)-$(Build.BuildNumber)"
+
+trigger:
+  branches:
+    include:
+      - dev
+      - feature/*
+      - bug/*
+  paths:
+    include:
+      - ci/conf/MSFIO-NAV_Invoices_MainProcess/*
+
+parameters:
+  - name: process_version
+    displayName: Process version
+    type: string
+    default: ''
+
+variables:
+  - name: processName
+    value: "MSFIO-NAV_Invoices_MainProcess"
+  - name: processVersion
+    value: ${{ parameters.process_version }}
+    
+
+stages:
+  - template: .templates/integration_process.yml
+    parameters:
+      test_postmanCollection_SIT: ""
+      test_postmanEnvironment_SIT: ""
+      test_additionalParams_SIT: ""
+      test_testReportTitle_SIT: ""
+      test_postmanCollection_UAT: ""
+      test_postmanEnvironment_UAT: ""
+      test_additionalParams_UAT: ""
+      test_testReportTitle_UAT: ""
+      process_version: ${{ parameters.process_version }}
+
