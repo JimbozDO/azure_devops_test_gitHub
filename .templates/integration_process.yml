@@ -50,6 +50,8 @@ stages:
         parameters:
           jobName: "Create Package"
           process_version: ${{ parameters.process_version }}
+          buildReason: ${{ variables['Build.Reason'] }}
+
 
   - stage: Dev
     displayName: "Deploy to Dev Env" #Name displayed when viewing
@@ -67,7 +69,7 @@ stages:
           - script: |
               #!/bin/bash
               echo "[INFO] New var process_version - ${{ parameters.process_version }}"
-              ./build.sh
+              ./build.sh "$(Build.Reason)" "$(System.PullRequest.TargetBranch)" "$(parameters.process_version)"
             displayName: "Print Message"
 
   - stage: Test
@@ -82,8 +84,5 @@ stages:
     jobs:
       - template: test_job_template.yml
         parameters:
-          postmanCollection: ${{ parameters.test_postmanCollection_SIT }}
-          postmanEnvironment: ${{ parameters.test_postmanEnvironment_SIT }}
-          additionalParams: ${{ parameters.test_additionalParams_SIT }}
-          testReportTitle: ${{ parameters.test_testReportTitle_SIT }}
+          process_version: ${{ parameters.process_version }}
 

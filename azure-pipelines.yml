@@ -6,9 +6,12 @@ trigger:
       - dev
       - feature/*
       - bug/*
-  paths:
+
+pr:
+  branches:
     include:
-      - ci/conf/MSFIO-NAV_Invoices_MainProcess/*
+    - dev
+    - bug/*
 
 parameters:
   - name: process_version
