@@ -11,6 +11,8 @@ pr:
   branches:
     include:
     - dev
+    - bug/*
+    - test/*
 
 parameters:
   - name: process_version
