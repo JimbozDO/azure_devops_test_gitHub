@@ -5,6 +5,9 @@ parameters:
   - name: process_version
     type: string
     default: ""
+  - name: buildReason
+    type: string
+    default: ""
 
 jobs:
   - job: Job_1
@@ -13,3 +16,4 @@ jobs:
       - script: |
             #!/bin/bash
             echo "[INFO] Inside the build_job_template.yml - ${{ parameters.process_version }}"
+            echo "[INFO] build Reason - ${{ parameters.buildReason }}"
